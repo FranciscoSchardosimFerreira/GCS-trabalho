@@ -29,4 +29,14 @@ public class Funcionario {
     public void setDepartamento(Departamento departamento) {
         this.departamento = departamento;
     }
+
+
+    @Override
+    public String toString() {
+        return "Funcionario{" +
+                "matricula=" + matricula +
+                ", nome='" + nome + '\'' +
+                ", departamento=" + departamento +
+                '}';
+    }
 }
