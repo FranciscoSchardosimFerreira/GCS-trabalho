@@ -2,7 +2,7 @@ public enum Departamento {
 
     RH,
     COMPRAS,
-    VEBDAS,
+    VENDAS,
     EXPEDICAO,
     PRODUCAO,
     ENGENHARIA
