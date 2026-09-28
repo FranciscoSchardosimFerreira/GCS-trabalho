@@ -1,3 +1,5 @@
+package Dados;
+
 public class Funcionario {
 
     private int matricula;

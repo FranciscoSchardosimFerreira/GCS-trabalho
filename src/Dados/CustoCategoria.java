@@ -1,3 +1,4 @@
+package Dados;
 public enum CustoCategoria {
 
     AQUSISCAODEBENS,

@@ -1,3 +1,5 @@
+package Dados;
+
 public enum Departamento {
 
     RH,
