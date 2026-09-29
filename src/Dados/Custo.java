@@ -1,4 +1,4 @@
-
+package Dados;
 import java.time.LocalDate;
 public class Custo {
 
