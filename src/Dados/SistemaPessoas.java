@@ -1,3 +1,5 @@
+package Dados;
+
 import java.util.ArrayList;
 
 public class SistemaPessoas {
@@ -25,7 +27,7 @@ public class SistemaPessoas {
             if (i.getNome().equals(nome)){
                 this.funcionarioAtual = i;
                 return;
-                
+
             }
 
 
