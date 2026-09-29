@@ -11,5 +11,7 @@ void main() {
     Sistema.adicionarFuncionario(Alexandre);
     Sistema.adicionarFuncionario(Bianca);
 
+    Sistema.selecionarFuncionario("Bianca");
+    Sistema.printFuncionarios();
 
 }
