@@ -1,7 +1,7 @@
 package Dados;
 public enum CustoCategoria {
 
-    AQUSISCAODEBENS,
+    AQUISICAODEBENS,
     MANUTENCAODEBENS,
     OUTROSSERVICOS
 
