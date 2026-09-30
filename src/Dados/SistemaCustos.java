@@ -32,6 +32,15 @@ public class SistemaCustos   {
 
     }
 
+    public void excluirCustoMaisRecente()
+    {
+        sortarPorData(custos);
+
+        var custoRecente = custos.getLast();
+
+        custos.remove(custoRecente);
+    }
+
 
 
     public ArrayList<Custo>  acharCustoPorDescricao (String descricao) {
