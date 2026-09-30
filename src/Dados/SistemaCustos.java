@@ -14,6 +14,10 @@ public class SistemaCustos   {
     }
 
 
+    public ArrayList<Custo> getCustos() {
+        return custos;
+    }
+
     public void adicionarFuncionario(Custo c) {
         custos.add(c);
     }
