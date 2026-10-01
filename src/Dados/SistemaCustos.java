@@ -222,4 +222,41 @@ public class SistemaCustos {
     public ArrayList<Custo> getCustos() {
         return custos;
     }
+}public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
+
+    ArrayList<Custo> custosPeriodo = new ArrayList<>();
+
+    for (Custo custo : custos) {
+        if (!custo.getData().isBefore(inicio)
+                && !custo.getData().isAfter(fim)) {
+
+            custosPeriodo.add(custo);
+        }
+    }
+
+    sortarPorData(custosPeriodo);
+
+    return custosPeriodo;
+}
+
+public void mostrarRelatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
+
+    ArrayList<Custo> resultado = relatorioPorPeriodo(inicio, fim);
+
+    System.out.println("\nRELATÓRIO POR PERÍODO");
+    System.out.println("Período: " + inicio + " até " + fim);
+
+    if (resultado.isEmpty()) {
+        System.out.println("Nenhum custo encontrado nesse período.");
+        return;
+    }
+
+    double total = 0;
+
+    for (Custo custo : resultado) {
+        System.out.println(custo);
+        total += custo.getValor();
+    }
+
+    System.out.printf("Total do período: R$ %.2f%n", total);
 }
