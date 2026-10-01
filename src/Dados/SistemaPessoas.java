@@ -16,6 +16,12 @@ public class SistemaPessoas {
     }
 
     public void adicionarFuncionario(Funcionario f) {
+        if(f == null){
+            throw new IllegalArgumentException("Funcionário nulo.");
+        }
+        if(existeMatricula(f.getMatricula())){
+            throw new IllegalArgumentException("Matrícula já cadastrada!");
+        }
         funcionarios.add(f);
     }
 
