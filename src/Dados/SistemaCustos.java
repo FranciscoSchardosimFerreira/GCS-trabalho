@@ -222,4 +222,24 @@ public class SistemaCustos {
     public ArrayList<Custo> getCustos() {
         return custos;
     }
+
+    public void listarTodosCustos() {
+
+        if (custos.isEmpty()) {
+            System.out.println("Nenhum custo cadastrado.");
+            return;
+        }
+
+        // copia a lista para nao mudar a ordem da original
+        ArrayList<Custo> listagem = new ArrayList<>(custos);
+
+        Collections.sort(listagem);
+        Collections.reverse(listagem);
+
+        System.out.println("\n===== LISTAGEM GERAL DE CUSTOS =====");
+
+        for (Custo c : listagem) {
+            System.out.println(c);
+        }
+    }
 }
