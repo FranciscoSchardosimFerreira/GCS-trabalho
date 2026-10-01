@@ -48,6 +48,19 @@ public class Funcionario {
         this.departamento = departamento;
     }
 
+    public String mostrarIniciais(){
+        StringBuilder iniciais = new StringBuilder();
+        for(String parte : nome.trim().split("\\s+")){
+            if(!parte.isEmpty()){
+                iniciais.append(Character.toUpperCase(parte.charAt(0)));
+            }
+        }
+
+        return iniciais.toString();
+    }
+
+
+
 
     @Override
     public String toString() {
