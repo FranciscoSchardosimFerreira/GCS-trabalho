@@ -65,8 +65,21 @@ public class Dashboard {
             totais.put(c.getDepartamento(), totais.get(c.getDepartamento()) + c.getValor());
         }
         return totais;
+    }public void mostrarResumoPorCategoria() {
+
+    System.out.println("\nRESUMO POR CATEGORIA");
+
+    EnumMap<CustoCategoria, Double> totais = getTotalPorCategoria();
+
+    for (var entrada : totais.entrySet()) {
+        System.out.printf(
+                "%-20s R$ %.2f%n",
+                entrada.getKey(),
+                entrada.getValue()
+        );
     }
 
+}
     public EnumMap<CustoCategoria, Double> getTotalPorCategoria() {
         EnumMap<CustoCategoria, Double> totais = new EnumMap<>(CustoCategoria.class);
         for (CustoCategoria cat : CustoCategoria.values()) {
