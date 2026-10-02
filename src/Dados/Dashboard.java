@@ -1,6 +1,5 @@
 package Dados;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 
 public class Dashboard {
@@ -65,21 +64,8 @@ public class Dashboard {
             totais.put(c.getDepartamento(), totais.get(c.getDepartamento()) + c.getValor());
         }
         return totais;
-    }public void mostrarResumoPorCategoria() {
-
-    System.out.println("\nRESUMO POR CATEGORIA");
-
-    EnumMap<CustoCategoria, Double> totais = getTotalPorCategoria();
-
-    for (var entrada : totais.entrySet()) {
-        System.out.printf(
-                "%-20s R$ %.2f%n",
-                entrada.getKey(),
-                entrada.getValue()
-        );
     }
 
-}
     public EnumMap<CustoCategoria, Double> getTotalPorCategoria() {
         EnumMap<CustoCategoria, Double> totais = new EnumMap<>(CustoCategoria.class);
         for (CustoCategoria cat : CustoCategoria.values()) {
@@ -89,6 +75,13 @@ public class Dashboard {
             totais.put(c.getCusotCategoria(), totais.get(c.getCusotCategoria()) + c.getValor());
         }
         return totais;
+    }
+
+    public void mostrarResumoPorCategoria() {
+        System.out.println("\nRESUMO POR CATEGORIA");
+        for (var entrada : getTotalPorCategoria().entrySet()) {
+            System.out.printf("%-20s R$ %.2f%n", entrada.getKey(), entrada.getValue());
+        }
     }
 
     public void mostrar() {
@@ -115,7 +108,7 @@ public class Dashboard {
 
         System.out.println("Total por departamento:");
         for (var entrada : getTotalPorDepartamento().entrySet()) {
-            System.out.printf("  %-12s R$ %.2f%n", entrada.getKey(), entrada.getValue());
+            System.out.printf("  %-18s R$ %.2f%n", entrada.getKey(), entrada.getValue());
         }
         System.out.println();
 
