@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class SistemaCustos {
@@ -151,6 +152,85 @@ public class SistemaCustos {
         for (Custo i : custosImpressos) {
             System.out.println(i);
         }
+    }
+
+    public void printCustos(ArrayList<Custo> custosImpressos, CriterioOrdenacao criterio, boolean crescente) {
+
+        for (Custo i : ordenarCustos(custosImpressos, criterio, crescente)) {
+            System.out.println(i);
+        }
+    }
+
+    // devolve uma nova lista, sem alterar a ordem da lista original
+    public ArrayList<Custo> ordenarCustos(ArrayList<Custo> lista, CriterioOrdenacao criterio, boolean crescente) {
+
+        ArrayList<Custo> ordenados = new ArrayList<>(lista);
+
+        Comparator<Custo> comparador = criterio.getComparador();
+
+        if (!crescente) {
+            comparador = comparador.reversed();
+        }
+
+        ordenados.sort(comparador);
+
+        return ordenados;
+    }
+
+    public void listarCustosOrdenados(Scanner sc) {
+
+        if (custos.isEmpty()) {
+            System.out.println("Não existem custos cadastrados.");
+            return;
+        }
+
+        CriterioOrdenacao[] criterios = CriterioOrdenacao.values();
+
+        System.out.println("\nOrdenar por:");
+
+        for (int i = 0; i < criterios.length; i++) {
+            System.out.println((i + 1) + " - " + criterios[i]);
+        }
+
+        CriterioOrdenacao criterio;
+
+        while (true) {
+            System.out.print("Escolha o critério: ");
+
+            try {
+                int opcao = Integer.parseInt(sc.nextLine().trim());
+
+                if (opcao >= 1 && opcao <= criterios.length) {
+                    criterio = criterios[opcao - 1];
+                    break;
+                }
+
+            } catch (NumberFormatException e) {
+                // Continua para a mensagem de erro
+            }
+
+            System.out.println("Opção inválida.");
+        }
+
+        boolean crescente;
+
+        while (true) {
+            System.out.print("1 - Crescente | 2 - Decrescente: ");
+
+            String opcao = sc.nextLine().trim();
+
+            if (opcao.equals("1") || opcao.equals("2")) {
+                crescente = opcao.equals("1");
+                break;
+            }
+
+            System.out.println("Opção inválida.");
+        }
+
+        System.out.println("\n===== CUSTOS ORDENADOS POR " + criterio.getNome().toUpperCase()
+                + (crescente ? " (CRESCENTE)" : " (DECRESCENTE)") + " =====");
+
+        printCustos(custos, criterio, crescente);
     }
 
     public void excluirCustoMaisRecente() {
