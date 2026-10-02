@@ -8,7 +8,7 @@ public enum CriterioOrdenacao {
     VALOR("Valor", Comparator.comparing(Custo::getValor)),
     DESCRICAO("Descrição", Comparator.comparing(Custo::getDescricao, String.CASE_INSENSITIVE_ORDER)),
     DEPARTAMENTO("Departamento", Comparator.comparing(c -> c.getDepartamento().getNome())),
-    CATEGORIA("Categoria", Comparator.comparing(c -> c.getCusotCategoria().name()));
+    CATEGORIA("Categoria", Comparator.comparing(c -> c.getCusotCategoria().getNome()));
 
     private String nome;
     private Comparator<Custo> comparador;

@@ -8,7 +8,6 @@ public class Funcionario {
     public Funcionario(int matricula, String nome, Departamento departamento) {
         if(matricula <= 0){
             throw new IllegalArgumentException("Matricula deve ser positiva.");
-        
         }
         if(nome == null || nome.trim().isEmpty()){
             throw new IllegalArgumentException("Nome não pode ser vazio.");
@@ -38,7 +37,7 @@ public class Funcionario {
         if(nome == null || nome.trim().isEmpty()){
             throw new IllegalArgumentException("Nome não pode ser vazio.");
         }
-        this.nome = nome;
+        this.nome = nome.trim();
     }
 
     public void setDepartamento(Departamento departamento) {
@@ -59,15 +58,8 @@ public class Funcionario {
         return iniciais.toString();
     }
 
-
-
-
     @Override
     public String toString() {
-        return "Funcionario{" +
-                "matricula=" + matricula +
-                ", nome='" + nome + '\'' +
-                ", departamento=" + departamento +
-                '}';
+        return String.format("%-5d %-28s %-5s %s", matricula, nome, mostrarIniciais(), departamento);
     }
 }
