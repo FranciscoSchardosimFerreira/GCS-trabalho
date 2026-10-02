@@ -1,5 +1,6 @@
 import Dados.Custo;
 import Dados.CustoCategoria;
+import Dados.Dashboard;
 import Dados.Departamento;
 import Dados.Funcionario;
 import Dados.SistemaCustos;

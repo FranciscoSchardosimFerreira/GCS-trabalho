@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class SistemaCustos {
@@ -153,6 +154,85 @@ public class SistemaCustos {
         }
     }
 
+    public void printCustos(ArrayList<Custo> custosImpressos, CriterioOrdenacao criterio, boolean crescente) {
+
+        for (Custo i : ordenarCustos(custosImpressos, criterio, crescente)) {
+            System.out.println(i);
+        }
+    }
+
+    // devolve uma nova lista, sem alterar a ordem da lista original
+    public ArrayList<Custo> ordenarCustos(ArrayList<Custo> lista, CriterioOrdenacao criterio, boolean crescente) {
+
+        ArrayList<Custo> ordenados = new ArrayList<>(lista);
+
+        Comparator<Custo> comparador = criterio.getComparador();
+
+        if (!crescente) {
+            comparador = comparador.reversed();
+        }
+
+        ordenados.sort(comparador);
+
+        return ordenados;
+    }
+
+    public void listarCustosOrdenados(Scanner sc) {
+
+        if (custos.isEmpty()) {
+            System.out.println("Não existem custos cadastrados.");
+            return;
+        }
+
+        CriterioOrdenacao[] criterios = CriterioOrdenacao.values();
+
+        System.out.println("\nOrdenar por:");
+
+        for (int i = 0; i < criterios.length; i++) {
+            System.out.println((i + 1) + " - " + criterios[i]);
+        }
+
+        CriterioOrdenacao criterio;
+
+        while (true) {
+            System.out.print("Escolha o critério: ");
+
+            try {
+                int opcao = Integer.parseInt(sc.nextLine().trim());
+
+                if (opcao >= 1 && opcao <= criterios.length) {
+                    criterio = criterios[opcao - 1];
+                    break;
+                }
+
+            } catch (NumberFormatException e) {
+                // Continua para a mensagem de erro
+            }
+
+            System.out.println("Opção inválida.");
+        }
+
+        boolean crescente;
+
+        while (true) {
+            System.out.print("1 - Crescente | 2 - Decrescente: ");
+
+            String opcao = sc.nextLine().trim();
+
+            if (opcao.equals("1") || opcao.equals("2")) {
+                crescente = opcao.equals("1");
+                break;
+            }
+
+            System.out.println("Opção inválida.");
+        }
+
+        System.out.println("\n===== CUSTOS ORDENADOS POR " + criterio.getNome().toUpperCase()
+                + (crescente ? " (CRESCENTE)" : " (DECRESCENTE)") + " =====");
+
+        printCustos(custos, criterio, crescente);
+    }
+
     public void excluirCustoMaisRecente() {
 
         sortarPorData(custos);
@@ -245,40 +325,43 @@ public class SistemaCustos {
 
     public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
-    ArrayList<Custo> custosPeriodo = new ArrayList<>();
+    public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
-    for (Custo custo : custos) {
-        if (!custo.getData().isBefore(inicio)
-                && !custo.getData().isAfter(fim)) {
+        ArrayList<Custo> custosPeriodo = new ArrayList<>();
 
-            custosPeriodo.add(custo);
+        for (Custo custo : custos) {
+            if (!custo.getData().isBefore(inicio)
+                    && !custo.getData().isAfter(fim)) {
+
+                custosPeriodo.add(custo);
+            }
         }
+
+        sortarPorData(custosPeriodo);
+
+        return custosPeriodo;
     }
 
-    sortarPorData(custosPeriodo);
+    public void mostrarRelatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
-    return custosPeriodo;
-}
+        ArrayList<Custo> resultado = relatorioPorPeriodo(inicio, fim);
 
-public void mostrarRelatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
+        System.out.println("\nRELATÓRIO POR PERÍODO");
+        System.out.println("Período: " + inicio + " até " + fim);
 
-    ArrayList<Custo> resultado = relatorioPorPeriodo(inicio, fim);
+        if (resultado.isEmpty()) {
+            System.out.println("Nenhum custo encontrado nesse período.");
+            return;
+        }
 
-    System.out.println("\nRELATÓRIO POR PERÍODO");
-    System.out.println("Período: " + inicio + " até " + fim);
+        double total = 0;
 
-    if (resultado.isEmpty()) {
-        System.out.println("Nenhum custo encontrado nesse período.");
-        return;
+        for (Custo custo : resultado) {
+            System.out.println(custo);
+            total += custo.getValor();
+        }
+
+        System.out.printf("Total do período: R$ %.2f%n", total);
     }
-
-    double total = 0;
-
-    for (Custo custo : resultado) {
-        System.out.println(custo);
-        total += custo.getValor();
-    }
-
-    System.out.printf("Total do período: R$ %.2f%n", total);
 }
 }
