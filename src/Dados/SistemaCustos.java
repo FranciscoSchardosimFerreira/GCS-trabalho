@@ -15,6 +15,9 @@ public class SistemaCustos {
     }
 
     public void adicionarCusto(Custo c) {
+        if (c == null) {
+            throw new IllegalArgumentException("O custo não pode ser nulo.");
+        }
         custos.add(c);
     }
 
@@ -64,6 +67,12 @@ public class SistemaCustos {
 
             try {
                 data = LocalDate.parse(sc.nextLine().trim());
+
+                if (data.isAfter(LocalDate.now())) {
+                    System.out.println("A data não pode ser futura.");
+                    continue;
+                }
+
                 break;
 
             } catch (DateTimeParseException e) {
