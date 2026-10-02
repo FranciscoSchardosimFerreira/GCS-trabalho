@@ -1,5 +1,6 @@
 import Dados.Custo;
 import Dados.CustoCategoria;
+import Dados.Dashboard;
 import Dados.Departamento;
 import Dados.Funcionario;
 import Dados.SistemaCustos;
@@ -38,6 +39,15 @@ public class Main {
         System.out.println("\n===== CUSTOS CADASTRADOS =====");
 
         sistemaCustos.acharCustoPorDescricao("");
+
+        // Dashboard
+        Dashboard dashboard = new Dashboard(sistemaCustos, sistemaPessoas);
+
+        System.out.println();
+        dashboard.mostrar();
+
+        System.out.println();
+        dashboard.mostrarEstatisticas();
 
         sc.close();
     }
