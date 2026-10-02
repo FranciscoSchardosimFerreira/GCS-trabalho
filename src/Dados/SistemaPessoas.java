@@ -120,17 +120,15 @@ public class SistemaPessoas {
     }
     
     public void listarDepartamentos() {
-    System.out.println("\n===== DEPARTAMENTOS =====");
+        System.out.println("\n===== DEPARTAMENTOS =====");
 
-    Departamento[] departamentos = Departamento.values();
+        Departamento[] departamentos = Departamento.values();
 
-    for (int i = 0; i < departamentos.length; i++) {
-        System.out.println((i + 1) + " - " + departamentos[i].getNome());
+        for (int i = 0; i < departamentos.length; i++) {
+            System.out.println((i + 1) + " - " + departamentos[i].getNome());
+        }
+
+        System.out.println("=========================");
     }
-
-    System.out.println("=========================");
-}
-
-}
 
 }

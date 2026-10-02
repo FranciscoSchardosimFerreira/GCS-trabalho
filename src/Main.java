@@ -37,7 +37,7 @@ public class Main {
         // Exibição dos custos cadastrados
         System.out.println("\n===== CUSTOS CADASTRADOS =====");
 
-        SistemaCustos.acharCustoPorDescricao("");
+        sistemaCustos.acharCustoPorDescricao("");
 
         sc.close();
     }

@@ -222,41 +222,43 @@ public class SistemaCustos {
     public ArrayList<Custo> getCustos() {
         return custos;
     }
-}public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
-    ArrayList<Custo> custosPeriodo = new ArrayList<>();
+    public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
-    for (Custo custo : custos) {
-        if (!custo.getData().isBefore(inicio)
-                && !custo.getData().isAfter(fim)) {
+        ArrayList<Custo> custosPeriodo = new ArrayList<>();
 
-            custosPeriodo.add(custo);
+        for (Custo custo : custos) {
+            if (!custo.getData().isBefore(inicio)
+                    && !custo.getData().isAfter(fim)) {
+
+                custosPeriodo.add(custo);
+            }
         }
+
+        sortarPorData(custosPeriodo);
+
+        return custosPeriodo;
     }
 
-    sortarPorData(custosPeriodo);
+    public void mostrarRelatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
-    return custosPeriodo;
-}
+        ArrayList<Custo> resultado = relatorioPorPeriodo(inicio, fim);
 
-public void mostrarRelatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
+        System.out.println("\nRELATÓRIO POR PERÍODO");
+        System.out.println("Período: " + inicio + " até " + fim);
 
-    ArrayList<Custo> resultado = relatorioPorPeriodo(inicio, fim);
+        if (resultado.isEmpty()) {
+            System.out.println("Nenhum custo encontrado nesse período.");
+            return;
+        }
 
-    System.out.println("\nRELATÓRIO POR PERÍODO");
-    System.out.println("Período: " + inicio + " até " + fim);
+        double total = 0;
 
-    if (resultado.isEmpty()) {
-        System.out.println("Nenhum custo encontrado nesse período.");
-        return;
+        for (Custo custo : resultado) {
+            System.out.println(custo);
+            total += custo.getValor();
+        }
+
+        System.out.printf("Total do período: R$ %.2f%n", total);
     }
-
-    double total = 0;
-
-    for (Custo custo : resultado) {
-        System.out.println(custo);
-        total += custo.getValor();
-    }
-
-    System.out.printf("Total do período: R$ %.2f%n", total);
 }
