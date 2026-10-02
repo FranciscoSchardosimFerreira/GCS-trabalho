@@ -1,6 +1,7 @@
 package Dados;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,31 +22,18 @@ public class SistemaCustos {
         custos.add(c);
     }
 
-    // O custo é sempre registrado em nome do funcionário atualmente logado
-    public void cadastrarCusto(Scanner sc, Funcionario funcionarioAtual) {
-
-        if (funcionarioAtual == null) {
-            System.out.println("Selecione um operador antes de registrar custos.");
-            return;
-        }
+    public void cadastrarCusto(Scanner sc) {
 
         System.out.println("\n===== CADASTRO DE CUSTO =====");
-        System.out.println("Registrado por: " + funcionarioAtual.getNome()
-                + " (" + funcionarioAtual.mostrarIniciais() + ")");
 
         // Valor
         double valor;
 
         while (true) {
-            System.out.print("Valor (R$): ");
+            System.out.print("Valor: ");
 
             try {
-                String texto = sc.nextLine().trim().replace("R$", "").trim();
-                // aceita 1.250,90 ou 1250.90
-                if (texto.contains(",")) {
-                    texto = texto.replace(".", "").replace(",", ".");
-                }
-                valor = Double.parseDouble(texto);
+                valor = Double.parseDouble(sc.nextLine().trim().replace(",", "."));
 
                 if (valor <= 0) {
                     System.out.println("O valor deve ser maior que zero.");
@@ -60,16 +48,96 @@ public class SistemaCustos {
         }
 
         // Descrição
-        String descricao = Entrada.lerTexto(sc, "Descrição: ");
+        String descricao;
+
+        do {
+            System.out.print("Descrição: ");
+            descricao = sc.nextLine().trim();
+
+            if (descricao.isEmpty()) {
+                System.out.println("A descrição não pode ser vazia.");
+            }
+
+        } while (descricao.isEmpty());
 
         // Data
-        LocalDate data = Entrada.lerData(sc, "Data (DD/MM/AAAA): ", false);
+        LocalDate data;
+
+        while (true) {
+            System.out.print("Data (AAAA-MM-DD): ");
+
+            try {
+                data = LocalDate.parse(sc.nextLine().trim());
+
+                if (data.isAfter(LocalDate.now())) {
+                    System.out.println("A data não pode ser futura.");
+                    continue;
+                }
+
+                break;
+
+            } catch (DateTimeParseException e) {
+                System.out.println("Data inválida. Use o formato AAAA-MM-DD.");
+            }
+        }
 
         // Departamento
-        Departamento departamento = Entrada.escolher(sc, "\nDepartamentos:", Departamento.values());
+        Departamento[] departamentos = Departamento.values();
+
+        System.out.println("\nDepartamentos:");
+
+        for (int i = 0; i < departamentos.length; i++) {
+            System.out.println((i + 1) + " - " + departamentos[i]);
+        }
+
+        Departamento departamento;
+
+        while (true) {
+            System.out.print("Escolha o departamento: ");
+
+            try {
+                int opcao = Integer.parseInt(sc.nextLine().trim());
+
+                if (opcao >= 1 && opcao <= departamentos.length) {
+                    departamento = departamentos[opcao - 1];
+                    break;
+                }
+
+            } catch (NumberFormatException e) {
+                // Continua para a mensagem de erro
+            }
+
+            System.out.println("Opção inválida.");
+        }
 
         // Categoria
-        CustoCategoria categoria = Entrada.escolher(sc, "\nCategorias:", CustoCategoria.values());
+        CustoCategoria[] categorias = CustoCategoria.values();
+
+        System.out.println("\nCategorias:");
+
+        for (int i = 0; i < categorias.length; i++) {
+            System.out.println((i + 1) + " - " + categorias[i]);
+        }
+
+        CustoCategoria categoria;
+
+        while (true) {
+            System.out.print("Escolha a categoria: ");
+
+            try {
+                int opcao = Integer.parseInt(sc.nextLine().trim());
+
+                if (opcao >= 1 && opcao <= categorias.length) {
+                    categoria = categorias[opcao - 1];
+                    break;
+                }
+
+            } catch (NumberFormatException e) {
+                // Continua para a mensagem de erro
+            }
+
+            System.out.println("Opção inválida.");
+        }
 
         // Criação do custo
         Custo custo = new Custo(
@@ -77,8 +145,7 @@ public class SistemaCustos {
                 descricao,
                 data,
                 departamento,
-                categoria,
-                funcionarioAtual
+                categoria
         );
 
         adicionarCusto(custo);
@@ -87,26 +154,13 @@ public class SistemaCustos {
         System.out.println(custo);
     }
 
-    // Lista do mais recente ao mais antigo (requisito 5)
     public void printCustos(ArrayList<Custo> custosImpressos) {
 
-        if (custosImpressos.isEmpty()) {
-            System.out.println("Nenhum custo encontrado.");
-            return;
-        }
+        sortarPorData(custosImpressos);
 
-        ArrayList<Custo> listagem = new ArrayList<>(custosImpressos);
-        listagem.sort(Collections.reverseOrder());
-
-        for (Custo i : listagem) {
+        for (Custo i : custosImpressos) {
             System.out.println(i);
         }
-
-        double total = 0;
-        for (Custo c : listagem) {
-            total += c.getValor();
-        }
-        System.out.println(listagem.size() + " registro(s) | Total: " + Entrada.formatarValor(total));
     }
 
     public void printCustos(ArrayList<Custo> custosImpressos, CriterioOrdenacao criterio, boolean crescente) {
@@ -139,7 +193,33 @@ public class SistemaCustos {
             return;
         }
 
-        CriterioOrdenacao criterio = Entrada.escolher(sc, "\nOrdenar por:", CriterioOrdenacao.values());
+        CriterioOrdenacao[] criterios = CriterioOrdenacao.values();
+
+        System.out.println("\nOrdenar por:");
+
+        for (int i = 0; i < criterios.length; i++) {
+            System.out.println((i + 1) + " - " + criterios[i]);
+        }
+
+        CriterioOrdenacao criterio;
+
+        while (true) {
+            System.out.print("Escolha o critério: ");
+
+            try {
+                int opcao = Integer.parseInt(sc.nextLine().trim());
+
+                if (opcao >= 1 && opcao <= criterios.length) {
+                    criterio = criterios[opcao - 1];
+                    break;
+                }
+
+            } catch (NumberFormatException e) {
+                // Continua para a mensagem de erro
+            }
+
+            System.out.println("Opção inválida.");
+        }
 
         boolean crescente;
 
@@ -162,36 +242,27 @@ public class SistemaCustos {
         printCustos(custos, criterio, crescente);
     }
 
-    public Custo getCustoMaisRecente() {
+    public void excluirCustoMaisRecente() {
+
+        sortarPorData(custos);
+
         if (custos.isEmpty()) {
-            return null;
-        }
-        return Collections.max(custos);
-    }
-
-    // Requisito 6: só o registro mais recente pode ser excluído.
-    // Não recebe parâmetro de propósito: não existe forma de pedir a exclusão de outro registro.
-    public Custo excluirCustoMaisRecente() {
-
-        Custo custoRecente = getCustoMaisRecente();
-
-        if (custoRecente == null) {
             System.out.println("Não existem custos cadastrados.");
-            return null;
+            return;
         }
+
+        Custo custoRecente = custos.getLast();
 
         custos.remove(custoRecente);
-        return custoRecente;
     }
 
     public ArrayList<Custo> acharCustoPorDescricao(String descricao) {
 
         ArrayList<Custo> custosAchados = new ArrayList<>();
-        String termo = descricao.trim().toLowerCase();
 
         for (Custo i : custos) {
 
-            if (i.getDescricao().toLowerCase().contains(termo)) {
+            if (i.getDescricao().contains(descricao)) {
                 custosAchados.add(i);
             }
         }
@@ -233,61 +304,6 @@ public class SistemaCustos {
         return custosAchados;
     }
 
-    public ArrayList<Custo> acharCustoPorData(LocalDate data) {
-
-        ArrayList<Custo> custosAchados = new ArrayList<>();
-
-        for (Custo i : custos) {
-
-            if (i.getData().equals(data)) {
-                custosAchados.add(i);
-            }
-        }
-
-        printCustos(custosAchados);
-
-        return custosAchados;
-    }
-
-    // Menu de pesquisa (requisito 5)
-    public void pesquisarCustos(Scanner sc) {
-
-        System.out.println("\n===== PESQUISAR CUSTOS =====");
-        System.out.println("1 - Por descrição");
-        System.out.println("2 - Por categoria");
-        System.out.println("3 - Por data");
-        System.out.println("4 - Por departamento");
-        System.out.println("0 - Voltar");
-
-        int opcao = Entrada.lerInteiro(sc, "Escolha: ", 0, 4);
-
-        switch (opcao) {
-            case 1 -> {
-                String termo = Entrada.lerTexto(sc, "Texto a pesquisar na descrição: ");
-                System.out.println("\nResultados para \"" + termo + "\" (mais recente primeiro):");
-                acharCustoPorDescricao(termo);
-            }
-            case 2 -> {
-                CustoCategoria cat = Entrada.escolher(sc, "Categorias:", CustoCategoria.values());
-                System.out.println("\nCustos da categoria " + cat + " (mais recente primeiro):");
-                acharCustoPorCategoria(cat);
-            }
-            case 3 -> {
-                LocalDate data = Entrada.lerData(sc, "Data (DD/MM/AAAA): ", true);
-                System.out.println("\nCustos de " + Entrada.formatarData(data) + ":");
-                acharCustoPorData(data);
-            }
-            case 4 -> {
-                Departamento dpt = Entrada.escolher(sc, "Departamentos:", Departamento.values());
-                System.out.println("\nCustos do departamento " + dpt + " (mais recente primeiro):");
-                acharCustoPorDepartamento(dpt);
-            }
-            default -> {
-                // 0 - voltar
-            }
-        }
-    }
-
     public void sortarPorData(ArrayList<Custo> custosDatados) {
         Collections.sort(custosDatados);
     }
@@ -303,10 +319,20 @@ public class SistemaCustos {
             return;
         }
 
-        System.out.println("\n===== LISTAGEM GERAL DE CUSTOS (mais recente primeiro) =====");
+        // copia a lista para nao mudar a ordem da original
+        ArrayList<Custo> listagem = new ArrayList<>(custos);
 
-        printCustos(custos);
+        Collections.sort(listagem);
+        Collections.reverse(listagem);
+
+        System.out.println("\n===== LISTAGEM GERAL DE CUSTOS =====");
+
+        for (Custo c : listagem) {
+            System.out.println(c);
+        }
     }
+
+    public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
     public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
@@ -330,7 +356,7 @@ public class SistemaCustos {
         ArrayList<Custo> resultado = relatorioPorPeriodo(inicio, fim);
 
         System.out.println("\nRELATÓRIO POR PERÍODO");
-        System.out.println("Período: " + Entrada.formatarData(inicio) + " até " + Entrada.formatarData(fim));
+        System.out.println("Período: " + inicio + " até " + fim);
 
         if (resultado.isEmpty()) {
             System.out.println("Nenhum custo encontrado nesse período.");
@@ -344,22 +370,7 @@ public class SistemaCustos {
             total += custo.getValor();
         }
 
-        System.out.println("Total do período: " + Entrada.formatarValor(total));
+        System.out.printf("Total do período: R$ %.2f%n", total);
     }
-
-    public void mostrarRelatorioPorPeriodo(Scanner sc) {
-
-        LocalDate inicio = Entrada.lerData(sc, "Data inicial (DD/MM/AAAA): ", true);
-        LocalDate fim;
-
-        while (true) {
-            fim = Entrada.lerData(sc, "Data final (DD/MM/AAAA): ", true);
-            if (!fim.isBefore(inicio)) {
-                break;
-            }
-            System.out.println("A data final não pode ser anterior à inicial.");
-        }
-
-        mostrarRelatorioPorPeriodo(inicio, fim);
-    }
+}
 }
