@@ -2,17 +2,27 @@ package Dados;
 import java.time.LocalDate;
 public class Custo implements Comparable<Custo> {
 
+    // contador para dar um número único a cada registro, na ordem em que foram cadastrados
+    private static int proximoId = 1;
+
+    private final int id;
     private Double valor;
     private String descricao;
     private LocalDate  data;
     private Departamento departamento;
+    private CustoCategoria cusotCategoria;
+    // funcionário (operador) que registrou o custo
+    private final Funcionario funcionario;
 
-    public Custo(Double valor, String descricao, LocalDate data, Departamento departamento, CustoCategoria cusotCategoria) {
+    public Custo(Double valor, String descricao, LocalDate data, Departamento departamento,
+                 CustoCategoria cusotCategoria, Funcionario funcionario) {
         this.valor = validarValor(valor);
         this.descricao = validarDescricao(descricao);
         this.data = validarData(data);
         this.departamento = validarDepartamento(departamento);
         this.cusotCategoria = validarCategoria(cusotCategoria);
+        this.funcionario = validarFuncionario(funcionario);
+        this.id = proximoId++;
     }
 
     private static Double validarValor(Double valor) {
@@ -56,6 +66,21 @@ public class Custo implements Comparable<Custo> {
         return categoria;
     }
 
+    private static Funcionario validarFuncionario(Funcionario funcionario) {
+        if (funcionario == null) {
+            throw new IllegalArgumentException("É preciso um funcionário logado para registrar um custo.");
+        }
+        return funcionario;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
     public CustoCategoria getCusotCategoria() {
         return cusotCategoria;
     }
@@ -64,8 +89,6 @@ public class Custo implements Comparable<Custo> {
         this.cusotCategoria = validarCategoria(cusotCategoria);
     }
 
-    private CustoCategoria cusotCategoria;
-
     public Departamento getDepartamento() {
         return departamento;
     }
@@ -73,11 +96,6 @@ public class Custo implements Comparable<Custo> {
     public void setDepartamento(Departamento departamento) {
         this.departamento = validarDepartamento(departamento);
     }
-
-
-
-
-
 
     public Double getValor() {
         return valor;
@@ -105,18 +123,24 @@ public class Custo implements Comparable<Custo> {
 
     @Override
     public String toString() {
-        return "Custo{" +
-                "valor=" + valor +
-                ", descricao='" + descricao + '\'' +
-                ", data=" + data +
-                ", departamento=" + departamento +
-                ", cusotCategoria=" + cusotCategoria +
-                '}';
+        return String.format("#%-3d %s | %13s | %-19s | %-17s | %s | registrado por %s (%s)",
+                id,
+                Entrada.formatarData(data),
+                Entrada.formatarValor(valor),
+                cusotCategoria,
+                departamento,
+                descricao,
+                funcionario.getNome(),
+                funcionario.mostrarIniciais());
     }
 
-    //paraordenarpordata
+    // ordena por data; no mesmo dia, o registrado por último é considerado o mais recente
     @Override
     public int compareTo(Custo next) {
-        return this.data.compareTo(next.data);
+        int comparacao = this.data.compareTo(next.data);
+        if (comparacao != 0) {
+            return comparacao;
+        }
+        return Integer.compare(this.id, next.id);
     }
 }
