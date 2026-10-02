@@ -35,17 +35,8 @@ public class Main {
         // Cadastro de custo
         sistemaCustos.cadastrarCusto(sc);
 
-        // Exibição dos custos cadastrados, na ordem escolhida pelo usuário
-        sistemaCustos.listarCustosOrdenados(sc);
-
-        // Dashboard
-        Dashboard dashboard = new Dashboard(sistemaCustos, sistemaPessoas);
-
-        System.out.println();
-        dashboard.mostrar();
-
-        System.out.println();
-        dashboard.mostrarEstatisticas();
+        // Exibição dos custos cadastrados
+        sistemaCustos.listarTodosCustos();
 
         sc.close();
     }

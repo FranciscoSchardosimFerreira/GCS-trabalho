@@ -303,6 +303,28 @@ public class SistemaCustos {
         return custos;
     }
 
+    public void listarTodosCustos() {
+
+        if (custos.isEmpty()) {
+            System.out.println("Nenhum custo cadastrado.");
+            return;
+        }
+
+        // copia a lista para nao mudar a ordem da original
+        ArrayList<Custo> listagem = new ArrayList<>(custos);
+
+        Collections.sort(listagem);
+        Collections.reverse(listagem);
+
+        System.out.println("\n===== LISTAGEM GERAL DE CUSTOS =====");
+
+        for (Custo c : listagem) {
+            System.out.println(c);
+        }
+    }
+
+    public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
+
     public ArrayList<Custo> relatorioPorPeriodo(LocalDate inicio, LocalDate fim) {
 
         ArrayList<Custo> custosPeriodo = new ArrayList<>();
@@ -341,4 +363,5 @@ public class SistemaCustos {
 
         System.out.printf("Total do período: R$ %.2f%n", total);
     }
+}
 }
