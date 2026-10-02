@@ -1,9 +1,12 @@
 package Dados;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -127,6 +130,55 @@ public class Dashboard {
         return totais;
     }
 
+    // ===== Requisito 7b: total dos custos do mês atual =====
+    public double getTotalMesAtual() {
+        YearMonth mesAtual = YearMonth.now();
+        double total = 0;
+        for (Custo c : sistemaCustos.getCustos()) {
+            if (YearMonth.from(c.getData()).equals(mesAtual)) {
+                total += c.getValor();
+            }
+        }
+        return total;
+    }
+
+    // ===== Requisito 7c: total dos últimos 3 meses, por departamento =====
+    // Considera o mês atual e os dois meses anteriores (meses completos do calendário)
+    public LocalDate getInicioUltimos3Meses() {
+        return YearMonth.now().minusMonths(2).atDay(1);
+    }
+
+    public EnumMap<Departamento, Double> getTotalUltimos3MesesPorDepartamento() {
+        LocalDate inicio = getInicioUltimos3Meses();
+        LocalDate hoje = LocalDate.now();
+        EnumMap<Departamento, Double> totais = new EnumMap<>(Departamento.class);
+        for (Departamento d : Departamento.values()) {
+            totais.put(d, 0.0);
+        }
+        for (Custo c : sistemaCustos.getCustos()) {
+            if (!c.getData().isBefore(inicio) && !c.getData().isAfter(hoje)) {
+                totais.put(c.getDepartamento(), totais.get(c.getDepartamento()) + c.getValor());
+            }
+        }
+        return totais;
+    }
+
+    // ===== Requisito 7d: 3 funcionários com a maior soma de custos registrados =====
+    public LinkedHashMap<Funcionario, Double> getTop3Funcionarios() {
+        Map<Funcionario, Double> somas = new LinkedHashMap<>();
+        for (Custo c : sistemaCustos.getCustos()) {
+            somas.merge(c.getFuncionario(), c.getValor(), Double::sum);
+        }
+        List<Map.Entry<Funcionario, Double>> ordenado = new ArrayList<>(somas.entrySet());
+        ordenado.sort(Map.Entry.<Funcionario, Double>comparingByValue().reversed());
+
+        LinkedHashMap<Funcionario, Double> top3 = new LinkedHashMap<>();
+        for (int i = 0; i < ordenado.size() && i < 3; i++) {
+            top3.put(ordenado.get(i).getKey(), ordenado.get(i).getValue());
+        }
+        return top3;
+    }
+
     public double getPercentual(double valor) {
         double total = getTotalCustos();
         if (total == 0) {
@@ -204,38 +256,66 @@ public class Dashboard {
     }
 
     public void mostrar() {
-        System.out.println("========== DASHBOARD ==========");
+        System.out.println("\n================== PAINEL GERAL ==================");
 
+        // a) funcionário atualmente logado
         Funcionario atual = sistemaPessoas.getFuncionarioAtual();
-        System.out.println("Funcionário atual: " + (atual != null ? atual.getNome() : "nenhum"));
-        System.out.println("Funcionários cadastrados: " + getQuantidadeFuncionarios());
+        System.out.println("Funcionário logado: " + (atual != null
+                ? atual.getNome() + " (" + atual.mostrarIniciais() + ") - " + atual.getDepartamento()
+                : "nenhum"));
         System.out.println();
 
+        // b) total do mês atual
+        System.out.println("Total dos custos do mês atual (" + formatarMes(YearMonth.now()) + "): "
+                + Entrada.formatarValor(getTotalMesAtual()));
+        System.out.println();
+
+        // c) últimos 3 meses por departamento
+        System.out.println("Total dos últimos 3 meses por departamento ("
+                + Entrada.formatarData(getInicioUltimos3Meses()) + " a "
+                + Entrada.formatarData(LocalDate.now()) + "):");
+        double totalTrimestre = 0;
+        for (var entrada : getTotalUltimos3MesesPorDepartamento().entrySet()) {
+            System.out.printf("  %-18s %15s%n", entrada.getKey(), Entrada.formatarValor(entrada.getValue()));
+            totalTrimestre += entrada.getValue();
+        }
+        System.out.printf("  %-18s %15s%n", "TOTAL", Entrada.formatarValor(totalTrimestre));
+        System.out.println();
+
+        // d) top 3 funcionários
+        System.out.println("Top 3 funcionários com maior soma de custos registrados:");
+        LinkedHashMap<Funcionario, Double> top3 = getTop3Funcionarios();
+        if (top3.isEmpty()) {
+            System.out.println("  Nenhum custo registrado.");
+        }
+        int posicao = 1;
+        for (var entrada : top3.entrySet()) {
+            Funcionario f = entrada.getKey();
+            System.out.printf("  %dº %-28s %-5s %15s%n", posicao++, f.getNome(),
+                    f.mostrarIniciais(), Entrada.formatarValor(entrada.getValue()));
+        }
+        System.out.println();
+
+        // informações complementares
+        System.out.println("---------------- Resumo geral ----------------");
+        System.out.println("Funcionários cadastrados: " + getQuantidadeFuncionarios());
         System.out.println("Custos registrados: " + getQuantidadeCustos());
-        System.out.printf("Total dos custos: R$ %.2f%n", getTotalCustos());
-        System.out.printf("Média por custo: R$ %.2f%n", getMediaCustos());
+        System.out.println("Total geral dos custos: " + Entrada.formatarValor(getTotalCustos()));
+        System.out.println("Média por custo: " + Entrada.formatarValor(getMediaCustos()));
 
         Custo maior = getMaiorCusto();
         if (maior != null) {
-            System.out.printf("Maior custo: %s (R$ %.2f)%n", maior.getDescricao(), maior.getValor());
+            System.out.println("Maior custo: " + maior.getDescricao() + " (" + Entrada.formatarValor(maior.getValor()) + ")");
         }
-        Custo recente = getCustoMaisRecente();
+        Custo recente = sistemaCustos.getCustoMaisRecente();
         if (recente != null) {
-            System.out.println("Custo mais recente: " + recente.getDescricao() + " (" + recente.getData() + ")");
+            System.out.println("Custo mais recente: " + recente.getDescricao()
+                    + " (" + Entrada.formatarData(recente.getData()) + ")");
         }
-        System.out.println();
+        System.out.println("==================================================");
+    }
 
-        System.out.println("Total por departamento:");
-        for (var entrada : getTotalPorDepartamento().entrySet()) {
-            System.out.printf("  %-18s R$ %.2f%n", entrada.getKey(), entrada.getValue());
-        }
-        System.out.println();
-
-        System.out.println("Total por categoria:");
-        for (var entrada : getTotalPorCategoria().entrySet()) {
-            System.out.printf("  %-18s R$ %.2f%n", entrada.getKey(), entrada.getValue());
-        }
-
-        System.out.println("===============================");
+    private String formatarMes(YearMonth mes) {
+        return String.format("%02d/%d", mes.getMonthValue(), mes.getYear());
     }
 }

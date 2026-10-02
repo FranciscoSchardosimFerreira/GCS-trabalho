@@ -5,8 +5,6 @@ import java.util.Scanner;
 
 public class SistemaPessoas {
 
-    private Scanner sc;
-
     private ArrayList<Funcionario> funcionarios;
 
     private Funcionario funcionarioAtual;
@@ -31,28 +29,46 @@ public class SistemaPessoas {
 
     public void selecionarFuncionario(String nome) {
         for (Funcionario i : funcionarios) {
-            if (i.getNome().equals(nome)) {
+            if (i.getNome().equalsIgnoreCase(nome.trim())) {
                 this.funcionarioAtual = i;
                 return;
             }
         }
-        System.out.println("não encontrado!");
-        return;
+        System.out.println("Funcionário não encontrado!");
+    }
+
+    // Requisito 1: escolher de uma lista o funcionário que está usando o sistema
+    public void selecionarFuncionario(Scanner sc) {
+        if (funcionarios.isEmpty()) {
+            System.out.println("Não há funcionários cadastrados.");
+            return;
+        }
+        System.out.println("\n===== SELECIONAR OPERADOR =====");
+        printFuncionarios();
+        int opcao = Entrada.lerInteiro(sc, "Número do funcionário que vai usar o sistema: ", 1, funcionarios.size());
+        funcionarioAtual = funcionarios.get(opcao - 1);
+        System.out.println("Operador atual: " + funcionarioAtual.getNome()
+                + " (" + funcionarioAtual.mostrarIniciais() + ")");
+    }
+
+    public void setFuncionarioAtual(Funcionario funcionario) {
+        if (funcionario != null && !funcionarios.contains(funcionario)) {
+            throw new IllegalArgumentException("Funcionário não cadastrado.");
+        }
+        this.funcionarioAtual = funcionario;
     }
 
     public void printFuncionarios() {
-        for (Funcionario i : funcionarios) {
-            if (i == funcionarioAtual) {
-                System.out.println(i.getNome() + "(ATUAL) \n");
-            } else {
-                System.out.println(i.getNome() + "\n");
-            }
+        System.out.printf("%-4s %-5s %-28s %-5s %s%n", "Nº", "Matr.", "Nome", "Inic.", "Departamento");
+        for (int i = 0; i < funcionarios.size(); i++) {
+            Funcionario f = funcionarios.get(i);
+            String marcador = (f == funcionarioAtual) ? "  <- ATUAL" : "";
+            System.out.printf("%-4s %s%s%n", (i + 1) + ")", f, marcador);
         }
-        return;
     }
 
-    public void cadastrarFuncionario(Scanner sc) {
-        System.out.println("Cadastramento de funcionário");
+    public Funcionario cadastrarFuncionario(Scanner sc) {
+        System.out.println("\n===== CADASTRO DE FUNCIONÁRIO =====");
         int matricula;
         String nome;
 
@@ -62,6 +78,10 @@ public class SistemaPessoas {
                 matricula = Integer.parseInt(sc.nextLine().trim());
             } catch (NumberFormatException e) {
                 System.out.println("Matricula inválida, digite apenas números.");
+                continue;
+            }
+            if (matricula <= 0) {
+                System.out.println("A matrícula deve ser um número positivo.");
                 continue;
             }
             if (existeMatricula(matricula)) {
@@ -79,31 +99,14 @@ public class SistemaPessoas {
             }
         } while (nome.isEmpty());
 
-        Departamento[] departamentos = Departamento.values();
-        System.out.println("Departamentos: ");
-        for (int i = 0; i < departamentos.length; i++) {
-            System.out.println((i + 1) + " - " + departamentos[i]);
-        }
-
-        Departamento departamento;
-        while (true) {
-            System.out.println("Escolha o departamento do funcionário:");
-            try {
-                int opcao = Integer.parseInt(sc.nextLine().trim());
-                if (opcao >= 1 && opcao <= departamentos.length) {
-                    departamento = departamentos[opcao - 1];
-                    break;
-                }
-            } catch (NumberFormatException e) {
-                // cai na mensagem abaixo
-            }
-            System.out.println("Opção inválida");
-        }
+        Departamento departamento = Entrada.escolher(sc, "Departamentos:", Departamento.values());
 
         Funcionario funcionario = new Funcionario(matricula, nome, departamento);
         adicionarFuncionario(funcionario);
 
         System.out.println("O funcionário está cadastrado no sistema!");
+        System.out.println(funcionario);
+        return funcionario;
     }
 
     public boolean existeMatricula(int matricula) {
@@ -118,14 +121,20 @@ public class SistemaPessoas {
     public Funcionario getFuncionarioAtual() {
         return funcionarioAtual;
     }
-    
+
     public void listarDepartamentos() {
         System.out.println("\n===== DEPARTAMENTOS =====");
 
         Departamento[] departamentos = Departamento.values();
 
         for (int i = 0; i < departamentos.length; i++) {
-            System.out.println((i + 1) + " - " + departamentos[i].getNome());
+            int quantidade = 0;
+            for (Funcionario f : funcionarios) {
+                if (f.getDepartamento() == departamentos[i]) {
+                    quantidade++;
+                }
+            }
+            System.out.printf("%d - %-18s %d funcionário(s)%n", i + 1, departamentos[i].getNome(), quantidade);
         }
 
         System.out.println("=========================");
